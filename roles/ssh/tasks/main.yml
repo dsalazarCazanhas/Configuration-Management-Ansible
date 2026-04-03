@@ -1,0 +1,6 @@
+---
+- name: Add authorized SSH public key to ubuntu user
+  ansible.posix.authorized_key:
+    user: "{{ ansible_user }}"
+    state: present
+    key: "{{ ssh_public_key }}"

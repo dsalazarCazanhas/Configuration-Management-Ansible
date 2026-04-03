@@ -1,0 +1,47 @@
+---
+- name: Ensure git is installed
+  ansible.builtin.apt:
+    name: git
+    state: present
+    update_cache: true
+
+- name: Remove stale clone directory if exists
+  ansible.builtin.file:
+    path: "{{ app_repo_dest }}"
+    state: absent
+
+- name: Clone static site repository from GitHub
+  ansible.builtin.git:
+    repo: "{{ app_repo_url }}"
+    dest: "{{ app_repo_dest }}"
+    version: "{{ app_repo_version }}"
+    single_branch: true
+    depth: 1
+  environment:
+    GIT_TERMINAL_PROMPT: "0"
+
+- name: Ensure web root directory exists
+  ansible.builtin.file:
+    path: "{{ nginx_web_root }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+
+- name: Copy site files to web root
+  ansible.builtin.copy:
+    src: "{{ app_repo_dest }}/{{ app_site_subdir }}/"
+    dest: "{{ nginx_web_root }}/"
+    owner: www-data
+    group: www-data
+    mode: '0644'
+    directory_mode: '0755'
+    remote_src: true
+
+- name: Ensure web root directory is traversable by nginx
+  ansible.builtin.file:
+    path: "{{ nginx_web_root }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
