@@ -1,0 +1,13 @@
+---
+# Python interpreter — explícito para evitar warning de auto-discovery
+ansible_python_interpreter: /usr/bin/python3
+
+# Static site source
+app_repo_url: https://github.com/dsalazarCazanhas/Static-Site-Server
+app_repo_dest: /tmp/static-site-repo
+app_repo_version: master
+app_site_subdir: site
+
+# Nginx
+nginx_web_root: /var/www/html
+nginx_server_name: "{{ ansible_host }}"
