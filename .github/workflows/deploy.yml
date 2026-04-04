@@ -1,0 +1,26 @@
+name: Deploy Node.js App
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'app/**'   # Only trigger when app code changes
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /opt/hello-world
+            git pull
+            cd app
+            npm install --omit=dev
+            pm2 restart hello-world || pm2 start server.js --name hello-world
+            pm2 save
