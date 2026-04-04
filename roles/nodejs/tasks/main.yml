@@ -1,0 +1,71 @@
+---
+- name: Download NodeSource setup script for Node.js 20
+  ansible.builtin.get_url:
+    url: https://deb.nodesource.com/setup_20.x
+    dest: /tmp/nodesource_setup.sh
+    mode: '0755'
+
+- name: Run NodeSource setup script
+  ansible.builtin.command: bash /tmp/nodesource_setup.sh
+  changed_when: false
+
+- name: Install Node.js
+  ansible.builtin.apt:
+    name: nodejs
+    state: present
+    update_cache: true
+
+- name: Install PM2 globally
+  community.general.npm:
+    name: pm2
+    global: true
+    state: present
+
+- name: Clone application repository
+  ansible.builtin.command:
+    cmd: git clone {{ node_app_repo_url }} {{ node_app_dir }}
+  args:
+    creates: "{{ node_app_dir }}"
+  environment:
+    GIT_TERMINAL_PROMPT: "0"
+
+- name: Install Node.js app dependencies
+  ansible.builtin.command:
+    cmd: npm install --omit=dev
+    chdir: "{{ node_app_dir }}/app"
+  changed_when: false
+
+- name: Create PM2 systemd startup service
+  ansible.builtin.command: pm2 startup systemd -u ubuntu --hp /home/ubuntu
+  changed_when: false
+
+- name: Enable PM2 systemd service
+  ansible.builtin.systemd:
+    name: pm2-ubuntu
+    enabled: true
+    daemon_reload: true
+
+- name: Check if app is already running in PM2
+  ansible.builtin.command: pm2 list
+  become_user: ubuntu
+  register: pm2_list
+  changed_when: false
+
+- name: Start app with PM2 (first time)
+  ansible.builtin.command: >
+    pm2 start {{ node_app_dir }}/{{ node_app_entry }}
+    --name {{ node_app_name }}
+  become_user: ubuntu
+  when: node_app_name not in pm2_list.stdout
+  changed_when: true
+
+- name: Restart app with PM2 (if already registered)
+  ansible.builtin.command: pm2 restart {{ node_app_name }}
+  become_user: ubuntu
+  when: node_app_name in pm2_list.stdout
+  changed_when: true
+
+- name: Save PM2 process list for persistence on reboot
+  ansible.builtin.command: pm2 save
+  become_user: ubuntu
+  changed_when: false

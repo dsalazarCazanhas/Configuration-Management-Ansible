@@ -2,4 +2,4 @@
 # Public key to add to the server's authorized_keys
 # Generate from your .pem with: ssh-keygen -y -f ~/.ssh/your-key.pem
 # Example: ssh-ed25519 AAAA... user@host
-ssh_public_key: "REPLACE_WITH_YOUR_PUBLIC_KEY"
+ssh_public_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA1WmosH0NSnlSkIM6dn3pZjvkD/rGNAC7xR8Wbgpws5"

@@ -11,3 +11,10 @@ app_site_subdir: site
 # Nginx
 nginx_web_root: /var/www/html
 nginx_server_name: "{{ ansible_host }}"
+
+# Node.js app
+node_app_repo_url: https://github.com/dsalazarCazanhas/Configuration-Management-Ansible
+node_app_dir: /opt/hello-world
+node_app_entry: app/server.js
+node_app_name: hello-world
+node_app_port: 3000

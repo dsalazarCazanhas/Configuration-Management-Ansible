@@ -1,0 +1,6 @@
+---
+- name: Restart app via PM2
+  ansible.builtin.command: pm2 restart {{ node_app_name }}
+  become_user: ubuntu
+  changed_when: true
+  listen: restart node app
