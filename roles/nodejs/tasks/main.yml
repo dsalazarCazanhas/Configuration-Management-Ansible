@@ -29,6 +29,13 @@
   environment:
     GIT_TERMINAL_PROMPT: "0"
 
+- name: Set ownership of app directory to ubuntu
+  ansible.builtin.file:
+    path: "{{ node_app_dir }}"
+    owner: ubuntu
+    group: ubuntu
+    recurse: true
+
 - name: Install Node.js app dependencies
   ansible.builtin.command:
     cmd: npm install --omit=dev
