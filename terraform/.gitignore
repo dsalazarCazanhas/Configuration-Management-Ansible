@@ -1,0 +1,10 @@
+# Terraform state — contains sensitive infrastructure data
+*.tfstate
+*.tfstate.backup
+
+# Terraform working directory
+.terraform/
+.terraform.lock.hcl
+
+# Real variable values — use terraform.tfvars.example as template
+terraform.tfvars
